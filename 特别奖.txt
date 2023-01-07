@@ -1,0 +1,47 @@
+
+# 日志表里获得创始人特别奖
+# -------------------------------------------------------
+SELECT user_name,remark, 
+	record_type,record_class, 
+	amount, org_amount,
+	now_amount,
+	create_time 
+FROM b_assets_change_record_2022_9 
+WHERE remark = '创始人特别奖二期' 
+AND create_time BETWEEN '2022-09-02 19:05:04' AND '2022-09-02 19:05:07';
+# ORDER BY create_time DESC limit 100;
+
+
+
+# 没有得到创始人特别奖的号 
+# -------------------------------------------------------
+SELECT member_id, member_name,
+		sum(price * buyNum) AS total_入金,
+		sum(price * buyNum) * 0.05 AS 特别奖  
+FROM 
+	(
+	SELECT tx_order FROM b_assets_change_record_2022_8 WHERE record_class = 47 and record_type IN (0,8)
+	Union ALL
+	SELECT tx_order FROM b_assets_change_record_2022_9 WHERE record_class = 47 and record_type IN (0,8)
+    ) a
+	INNER JOIN b_machine_sign b
+	ON a.tx_order = b.orderNo
+	AND Date(convert_tz(b.create_time,'UTC','Asia/Shanghai')) BETWEEN '2022-08-23' AND '2022-09-05'
+	AND b.member_name NOT IN (
+		SELECT user_name
+		FROM b_assets_change_record_2022_9 
+		WHERE remark = '创始人特别奖二期' 
+		AND create_time BETWEEN '2022-09-02 19:05:04' AND '2022-09-02 19:05:07' GROUP BY user_name)
+	GROUP BY member_id,b.member_name
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,179 @@
+
+个人月业绩总结
+-----------------------------------------------------------
+
+USDT业绩
+-------------------------------------------------------
+SELECT  y.member_name,sum(y.buyNum*y.price)
+FROM b_assets_change_record_2022_8 x
+INNER JOIN b_machine_sign y
+ON x.tx_order  = y.orderNo
+AND y.member_name = 'ks05'
+AND x.record_class = 47
+AND x.record_type = 8
+AND y.remark IS NULL
+AND Date(convert_tz(y.create_time,'UTC','Asia/Shanghai')) BETWEEN '2022-08-01' AND '2022-08-31';
+
+
+TIME业绩
+--------------------------------------------------------
+SELECT  sum(x.amount) AS 币价前, sum(x.amount*x.price) AS 币价后 ,y.member_name,sum(y.buyNum*y.price) AS USDT
+FROM b_assets_change_record_2022_8 x
+INNER JOIN b_machine_sign y
+ON x.tx_order  = y.orderNo
+AND y.member_name = 'ks05'
+AND x.record_class = 47
+AND x.record_type = 0
+AND y.remark NOT LIKE '%转让来源%'
+AND Date(convert_tz(y.create_time,'UTC','Asia/Shanghai')) BETWEEN '2022-08-01' AND '2022-08-31'
+Group BY member_name;
+
+
+个人奖业绩发货记录
+--------------------------------------------------------
+SELECT * FROM ec_individual_award; 
+
+
+个人奖业绩发货记录报表（按照表来） 
+--------------------------------------------------------
+SELECT 
+id 订单号,
+user_id 用户名_id, 
+user_name 用户名,
+receiver_name 收货人名, 
+receiver_cell_phone 手机号,
+receiver_id_card_number 身份证号,
+receiver_address 收货地址,
+product_first_qty A产品数量,
+product_second_qty B产品数量,
+convert_tz(create_time,'UTC','Asia/Shanghai') 下单日期,
+mail_fee 邮费,
+mail_coin 币种,
+send_status 发货状态
+FROM ec_individual_award
+WHERE DATE(convert_tz(create_time,'UTC','Asia/Shanghai'))>=  curdate();
+
+
+个人奖业绩发货记录报表（re-format with 产品类别）
+--------------------------------------------------------
+SELECT 
+	id  订单号,
+    user_id 用户名_id, 
+	user_name 用户名,
+	receiver_name 收货人名, 
+	receiver_cell_phone 手机号,
+	receiver_id_card_number 身份证号,
+	receiver_address 收货地址,
+	CASE WHEN product_first_qty != 0 THEN "A"  END  产品类别,
+        product_first_qty 发货数量,
+	product_first_qty,
+	product_second_qty,
+	convert_tz(create_time,'UTC','Asia/Shanghai') 下单日期,
+	mail_fee 邮费,
+	mail_coin 币种,
+	send_status 发货状态
+FROM ec_individual_award
+WHERE DATE(convert_tz(create_time,'UTC','Asia/Shanghai')) = '2022-09-21'
+AND product_first_qty != 0
+UNION ALL
+SELECT 
+	id  订单号,
+	user_id 用户名_id, 
+	user_name 用户名,
+	receiver_name 收货人名, 
+	receiver_cell_phone 手机号,
+	receiver_id_card_number 身份证号,
+	receiver_address 收货地址,
+	CASE WHEN product_second_qty != 0  THEN "B"  END  产品类别,
+	product_second_qty 发货数量,
+	product_first_qty,
+	product_second_qty,
+	convert_tz(create_time,'UTC','Asia/Shanghai') 下单日期,
+	mail_fee 邮费,
+	mail_coin 币种,
+	send_status 发货状态
+FROM ec_individual_award
+WHERE DATE(convert_tz(create_time,'UTC','Asia/Shanghai'))= '2022-09-21'
+AND product_second_qty != 0
+
+
+
+
+
+个人奖累计业绩 - 所有人list
+--------------------------------------------------------
+SELECT * FROM (
+	SELECT member_id,member_name, sum(buyNum * y.price) total,
+	sum(CASE WHEN y.remark IS NULL THEN buyNum * y.price ELSE 0 END) USDT_total,
+	sum(CASE WHEN y.remark IS NOT NULL THEN buyNum * y.price  ELSE 0 END) TIME_total
+	FROM report_personal_performance x
+	INNER JOIN b_machine_sign y
+	WHERE member_id IN (SELECT id FROM b_user_info GROUP BY id) 
+	AND x.tx_order = y.orderNo
+	AND x.record_type IN (0,8)
+	AND record_class = 47
+	AND Date(convert_tz(y.create_time,'UTC','Asia/Shanghai')) BETWEEN '2022-08-01' AND '2022-08-31'
+	GROUP BY member_id,member_name ) a
+WHERE total >= 1500;
+
+
+
+个人奖累计业绩 - List 所有人以及AB各多少奖励
+--------------------------------------------------------
+
+SELECT *,a_qty + b_qty AS total_qty
+FROM (
+    select 
+	   *,
+	  ( 
+		CASE 
+		  WHEN amount_total_price < 1500 THEN 0 
+		  WHEN amount_total_price = 1500 THEN 1 
+		  WHEN amount_total_price > 1500 
+		  AND amount_total_price < 2500 THEN 1 
+		  WHEN amount_total_price = 2500 THEN 1 
+		  ELSE ROUND((amount_total_price - 2500) / 1250 / 2)+1 
+		END 
+	  ) as a_qty, 
+	  ( 
+		CASE 
+		  WHEN amount_total_price < 1500 THEN 0 
+		  WHEN amount_total_price = 1500 THEN 0 
+		  WHEN amount_total_price > 1500 
+		  AND amount_total_price < 2500 THEN 0 
+		  WHEN amount_total_price = 2500 THEN 1 
+		  ELSE FLOOR((amount_total_price - 2500) / 1250 / 2)+1 
+		END 
+	  ) as b_qty 
+	from 
+	  ( 
+		SELECT 
+		  t.user_id as user_id, t.user_name AS user_name,
+		  ROUND(ABS(SUM(t.amount * IFNULL(t.price, 1)))) AS amount_total_price, 
+		  ROUND(ABS(SUM(t.amount)), 4) AS amount_total ,
+         	  ROUND(ABS(SUM(CASE WHEN record_type = 8  THEN t.amount * 1 ELSE 0 END))) USDT_total,
+          	  ROUND(ABS(SUM(CASE WHEN record_type = 0 THEN t.amount * t.price ELSE 0 END))) TIME_total
+		FROM 
+		  b_assets_change_record_2022_8 t 
+		WHERE 
+		  ( 
+			( 
+			  t.record_type = '0' 
+			  AND t.record_class = '47' 
+			) 
+			or ( 
+			  t.record_type = '8' 
+			  AND t.record_class = '47' 
+			) 
+		  ) 
+		AND  Date(convert_tz(t.create_time,'UTC','Asia/Shanghai')) BETWEEN '2022-08-01' AND '2022-08-31' 
+		GROUP BY 
+		  t.user_id ,t.user_name
+		HAVING 
+		  ROUND(ABS(SUM(t.amount * IFNULL(t.price, 1)))) >= 1500 
+		ORDER BY 
+		  t.user_id ASC 
+	# 	Limit 
+        # 	1000 
+	  ) as a
+)b

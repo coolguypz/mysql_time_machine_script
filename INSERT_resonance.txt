@@ -1,0 +1,76 @@
+# 注册商家
+
+SET @user_name = ''
+SET @user_id = ;
+SET @orderNo = CONCAT(625891, round(rand()*10000),DATE_FORMAT(now(), '%d%H%i%s'));
+SET @create_time = now();
+SET @id = CONCAT(159437,round(rand()*10000),DATE_FORMAT(now(), '%d%H%i%s'));
+
+#--------------------------------------------------------------------------------------------------------------------------------------
+
+# 注册商家表(b_business_info)
+INSERT INTO b_business_info
+(busi_name,busi_address,busi_images,busi_class,rate,busi_status,remark,busi_scope,user_id,create_time,jz_num,busi_license,busi_assurance)		
+VALUES
+(@user_name,@user_name,'http://res.cloudinary.com/dxx0vwptc/image/upload/v1669000062/61042e91-beeb-4063-911c-b7db7b601a42.png',@user_name,0.15000000,1,0,@user_name,@user_id,@create_time,0,'../../static/img/business.png',@user_name)	
+;
+
+# 更新共振表 b_resonance_sign
+UPDATE b_resonance_sign
+SET famount = 30811.8934, amount = 19188.1066, create_time = @create_time
+WHERE member_name = @user_name
+;
+
+# 增加锁共振的信息
+INSERT INTO b_resonance_lock_record
+(member_id,resonance_id,resonance_code,machine_id,lock_time,amount,status)
+VALUES
+(@user_id,3,'TIMC3',0,date_add(@create_time,interval 6 month),30811.8934,1)			
+;
+
+# 增加商家日志表 - 月份
+INSERT INTO b_assets_change_record_2022_
+(id,tx_no,tx_order,user_id,transfer_user_id,user_name,user_role,user_nickname,user_mobile_phone,transfer_user_name,transfer_user_mobile_phone,transfer_user_nick_name,remark,record_type,record_class,amount,org_amount,now_amount,create_time)
+VALUES
+( @id,'',@orderNo,@user_id,@user_id,@user_name,1,@user_name,@user_name,@user_name,@user_name,@user_name,'开店质押共振币',14,	74,	-30811.8934000000,	50000.0000000000,19188.1066000000,@create_time)		
+;	
+
+
+# ------------------------------------------------------------------------------------------------------------------
+
+# 商家记账 - 商家表
+
+# SET @id1 = CONCAT(159437,round(rand()*10000),DATE_FORMAT(date_add(@create_time, interval 1 second), '%d%H%i%s'));
+# SET @id2 = CONCAT(159437,round(rand()*10000),DATE_FORMAT(date_add(@create_time, interval 2 second), '%d%H%i%s'));
+# SET @amount = ;
+# SET @reward = round(-(@amount *0.15 / 0.154),4);
+
+# # 商家记账 - 商家表
+# INSERT INTO b_order_info
+# (user_id,busi_user_id,order_amount,order_no,create_time,confirm_time,remark,order_status,busi_id,source)
+# VALUES
+# (235681,@user_id,@amount,@orderNo,@create_time,date_add(@create_time,interval 5 minute),'扫码快速记账',1,@user_id,'pp16')
+# ;
+
+# # 商家记账 - 日志表
+# INSERT INTO b_assets_change_record_2022_10
+# (id,tx_no,tx_order,user_id,transfer_user_id,user_name,user_role,user_nickname,user_mobile_phone,transfer_user_name,transfer_user_mobile_phone,transfer_user_nick_name,remark,record_type,record_class,amount,org_amount,now_amount,create_time,price)
+# VALUES
+# # # 超过100
+# (@id1,'',@orderNo,	@user_id ,@user_id , @user_name,1, @user_name, @user_name, @user_name, @user_name, @user_name,'扣除元宇宙通证钱包奖励金',6,137,	@reward,1000.000000000,1000.1818000000,date_add(@create_time, interval 5 minute),0.1540000000),
+# (@id2,'',@orderNo,	@user_id ,@user_id , @user_name,1, @user_name, @user_name, @user_name, @user_name, @user_name,'用户消费,商家获得光年值TOKEN',10,124,@amount,1000.000000000,1000.0000000000,date_add(@create_time, interval 5 minute),'')
+#  # (1588694995023364096,620205861239281202,786192482898817024,	241781,	241781,	'k29',1,'k29','k29','k29','k29','k29','用户消费,用户节点确认TOKEN',9,38,700.0000000000,1000.6665000000,1000.000000,'2022-11-05 00:49:38',''),
+
+# # 少于100
+# (@id1,'',@orderNo,	@user_id ,@user_id , @user_name,1, @user_name, @user_name, @user_name, @user_name, @user_name,'扣除元宇宙通证钱包奖励金',6,137,@reward,1000.000000000,1000.1818000000,date_add(@create_time, interval 5 minute),0.1540000000),
+# (@id2,'',@orderNo,	@user_id ,@user_id , @user_name,1, @user_name, @user_name, @user_name,@user_name,@user_name,'用户消费,商家获得光年值TOKEN',10,124,@amount,1000.000000000,1000.0000000000,date_add(@create_time, interval 5 minute),'')
+# # (1588694995023364096,620205861239281202,786192482898817024,	241781,	241781,	'k29',1,'k29','k29','k29','k29','k29','用户消费,用户节点确认TOKEN',9,38,100.0000000000,1000.6665000000,1000.000000,'2022-11-05 00:49:38','')
+# ;
+
+# # 更新商家用户表的光年值 
+# UPDATE b_user_info 
+# SET user_token = user_token + @amount
+# WHERE user_name =  @user_name;
+
+
+# # SELECT * ,convert_tz(create_time,'UTC','asia/shanghai'),convert_tz(confirm_time,'UTC','asia/shanghai')FROM b_order_info WHERE busi_id = @user_id;

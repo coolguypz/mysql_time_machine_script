@@ -1,0 +1,24 @@
+
+# 获得节点TOKEN
+# -------------------------------------------------------
+
+SELECT id,user_name, machine_node_token FROM b_user_info WHERE user_name IN ('');
+
+
+
+# 获得光年值TOKEN 
+# -------------------------------------------------------
+
+SELECT 
+	(SELECT sum(user_token) FROM b_user_info WHERE user_name = '') +
+	(SELECT SUM(total_amount * buyNUM - get_token) FROM b_machine_sign where status = '1' AND member_name = '')
+
+
+
+
+
+
+
+
+
+

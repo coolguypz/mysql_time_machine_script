@@ -1,0 +1,23 @@
+
+# 个人钱包
+# （用户名， USDT资产，TIME资产，光年值TOKEN，节点TOKEN，时光机钱包，元宇宙钱包）
+# -------------------------------------------------------
+
+SELECT user_name,
+user_lint USDT资产,
+user_wallet TIME资产,
+user_token + sum(CASE WHEN b.status = 1 THEN b.total_amount * b.buyNUM - b.get_token ELSE 0 END)  光年值TOKEN,
+machine_node_token 节点TOKE,
+machine_wallet 时光机钱包,
+resonance_Wallet 元宇宙钱包
+machine_wallet + resonance_Wallet 新元宇宙钱包
+FROM b_user_info a
+INNER JOIN b_machine_sign b
+ON a.user_name IN ('','','','')
+AND a.id = b.member_id
+GROUP BY a.user_name;
+
+
+
+
+

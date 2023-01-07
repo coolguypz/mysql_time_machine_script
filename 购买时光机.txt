@@ -1,0 +1,39 @@
+
+# 购买时光机的细节
+
+# -------------------------------------------------------
+
+SELECT *, convert_tz(create_time,'UTC','Asia/Shanghai') FROM b_assets_change_record_2022_9 
+WHERE user_name = 'xfy1907872@163.com' 
+AND remark IN ('节点资产转换产出TIME'
+'节点资产转换到时光机购买钱包',
+'节点资产转换到元宇宙通证钱包',
+'节点资产转换—全球共振',
+'节点资产转换转入全球共振',
+'节点资产转换—平台维护',
+'节点资产转换转入平台维护',
+'光年值资产转换TIME',
+'光年值资产转换到时光机购买钱包',
+'光年值资产转换到元宇宙通证钱包',
+'光年值资产转换—全球共振',
+'光年值资产转换转入全球共振',
+'光年值资产转换—平台维护 ',
+'光年值资产转换转入平台维护')
+AND DATE(convert_tz(create_time,'UTC','Asia/Shanghai')) > '2022-09-14';
+
+
+
+
+
+
+1. 我的assets 有一个TIME， 而且只显示$1 ， 
+2. 当我来到exchange 的页面， 我的USDT资产是0， 也就是左手边的这个0USDT
+3. 除了price : 0.07 USDT, 我没有填加任何的数据， 然后点approve
+4. 这个时候， approve  就会变成SELL USDT -> TIME, 同时我的asset 页面的TIME也会根着变
+
+
+
+
+
+
+

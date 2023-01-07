@@ -1,0 +1,111 @@
+
+#  我的钱包
+#  -------------------------------------------------------------------------------------------
+
+SELECT a.id,user_name,
+	user_lint USDT资产,
+	user_wallet TIME资产,
+	user_token + sum(CASE WHEN b.status = 1 THEN b.total_amount * b.buyNUM - b.get_token ELSE 0 END)  光年值TOKEN,
+	machine_node_token 节点TOKE,
+	machine_wallet 时光机钱包,
+	resonance_Wallet 元宇宙钱包
+FROM b_user_info a
+INNER JOIN b_machine_sign b
+ON a.id = b.member_id
+AND a.user_name IN ('pp12','pp13','pp14','pp15','pp16','pz003','pz-02')
+GROUP BY a.user_name;
+
+
+#  CUCA 钱包
+#  -------------------------------------------------------------------------------------------
+
+SELECT 
+	x.user_id,
+	x.user_name,
+	产品产出USDT资产,
+	产品购买USDT资产,
+	产品购买TIME资产,
+	CUCA积分,
+	分红积分,
+	产品权证 
+FROM 
+(
+	SELECT user_id,user_name,
+	sum(wait_recovery_qty) CUCA积分,
+	sum(wait_bonus_qty) 分红积分
+	FROM  cuca_buy_package
+	GROUP BY user_name
+) x
+JOIN
+(
+	SELECT user_id,user_name,
+	sum(CASE WHEN category = 'CUCA_OUT_USDT' THEN balance ELSE 0 END) '产品产出USDT资产',
+	sum(CASE WHEN category = 'CUCA_BUY_USDT' THEN balance ELSE 0 END) '产品购买USDT资产',
+	sum(CASE WHEN category = 'CUCA_BUY_TIME' THEN balance ELSE 0 END) '产品购买TIME资产',
+	sum(CASE WHEN category = 'CUCA_PRODUCT' THEN balance ELSE 0  END) '产品权证'
+	FROM cuca_user_wallet
+	GROUP BY user_name
+) y
+ON x.user_id = y.user_id
+AND x.user_name IN ('pp12','pp13','pp14','pp15','pp16','pz003','pz-02')
+ORDER BY x.user_name;
+
+
+
+
+# 我的钱包 ， CUCA钱包  （ 如果用户有够买cuca产品用这个）
+# -----------------------------------------------------------------------------------------------------
+
+SELECT t1.*, 产品产出USDT资产,
+	产品购买USDT资产,
+	产品购买TIME资产,
+	CUCA积分,
+	分红积分,
+	产品权证 FROM
+(
+SELECT a.id,user_name,
+	user_lint USDT资产,
+	user_wallet TIME资产,
+	user_token + sum(CASE WHEN b.status = 1 THEN b.total_amount * b.buyNUM - b.get_token ELSE 0 END)  光年值TOKEN,
+	machine_node_token 节点TOKE,
+	machine_wallet 时光机钱包,
+	resonance_Wallet 元宇宙钱包
+	FROM b_user_info a
+	INNER JOIN b_machine_sign b
+	ON a.id = b.member_id
+	GROUP BY a.user_name
+) t1
+JOIN
+(
+SELECT 
+	x.user_id,
+	x.user_name,
+	产品产出USDT资产,
+	产品购买USDT资产,
+	产品购买TIME资产,
+	CUCA积分,
+	分红积分,
+	产品权证 
+FROM 
+(
+	SELECT user_id,user_name,
+	sum(wait_recovery_qty) CUCA积分,
+	sum(wait_bonus_qty) 分红积分
+	FROM  cuca_buy_package
+	GROUP BY user_name
+) x
+JOIN
+(
+	SELECT user_id,user_name,
+	sum(CASE WHEN category = 'CUCA_OUT_USDT' THEN balance ELSE 0 END) '产品产出USDT资产',
+	sum(CASE WHEN category = 'CUCA_BUY_USDT' THEN balance ELSE 0 END) '产品购买USDT资产',
+	sum(CASE WHEN category = 'CUCA_BUY_TIME' THEN balance ELSE 0 END) '产品购买TIME资产',
+	sum(CASE WHEN category = 'CUCA_PRODUCT' THEN balance ELSE 0  END) '产品权证'
+	FROM cuca_user_wallet
+	GROUP BY user_name
+) y
+ON x.user_id = y.user_id
+ORDER BY x.user_name
+)t2
+ON t1.id = t2.user_id
+AND t1.user_name IN ('pp12','pp13','pp14','pp15','pp16','pz003','pz-02')

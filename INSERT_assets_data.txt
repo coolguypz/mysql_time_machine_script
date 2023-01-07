@@ -1,0 +1,42 @@
+# 加资产
+
+SET @user_name = '';
+SET @user_id = ;
+SET @order_No = CONCAT(686569, round(rand()*10000),DATE_FORMAT(now(), '%d%H%i%s'));
+SET @create_time = '';
+SET @id = CONCAT(159437,round(rand()*10000),DATE_FORMAT(now(), '%d%H%i%s'));
+
+
+# 加共振 
+INSERT INTO b_resonance_sign
+(member_id,member_name,rId,famount,pamount,amount,rprice,get_money,get_token,isflag,remark,create_time,version,orderNo)
+VALUES
+(@user_id,@user_name,3,0.0000,0.0000,50000.0000,0.0060,0.0000,0.0000,0,'TIMC3','0000-00-00 00:00:00',0,@order_No)
+;
+
+# 加USDT资产，TIME资产，商家TIME资产，改注册时间 
+UPDATE b_user_info
+SET user_wallet = 5000,user_lint = 5000,resonance_Wallet = 5000,user_ysjf = 2000,create_time = @create_time
+WHERE id = @user_id
+;
+
+# 加绑定钱包
+INSERT INTO b_user_info_ext
+(id,uid,user_name,classify,bond,val,name,create_time,enable_flag)
+VALUES
+(@id,@user_id,@user_name,'time_bind','time','0x8d5d204d1CC8785aDFaf7816F52464f9FEdA1Ed7','用户时光链绑定钱包',@create_time,'Y')
+ ;
+
+# 加CUCA钱包资产 
+UPDATE cuca_user_wallet
+SET balance = 8000
+WHERE user_id = @user_id
+AND category IN (
+'CUCA_BUY_TIME','CUCA_PRODUCT','CUCA_PRODUCT_USDT65','CUCA_OUT_USDT')
+;
+UPDATE cuca_user_wallet
+SET balance = 50000
+WHERE user_id = @user_id
+AND category IN (
+'CUCA_BUY_USDT')
+;

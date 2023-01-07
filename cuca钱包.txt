@@ -1,0 +1,49 @@
+
+CUCA钱包
+------------------------------------------------------------------------------------
+SELECT 
+	x.user_id,
+	x.user_name,
+	产品产出USDT资产,
+	产品购买USDT资产,
+	产品购买TIME资产,
+	CUCA积分,
+	分红积分,
+	产品权证 
+FROM 
+(
+	SELECT user_id,user_name,
+	sum(wait_recovery_qty) CUCA积分,
+	sum(wait_bonus_qty) 分红积分
+	FROM  cuca_buy_package
+	GROUP BY user_name
+) x
+JOIN
+(
+	SELECT user_id,user_name,
+	sum(CASE WHEN category = 'CUCA_OUT_USDT' THEN balance ELSE 0 END) '产品产出USDT资产',
+	sum(CASE WHEN category = 'CUCA_BUY_USDT' THEN balance ELSE 0 END) '产品购买USDT资产',
+	sum(CASE WHEN category = 'CUCA_BUY_TIME' THEN balance ELSE 0 END) '产品购买TIME资产',
+	sum(CASE WHEN category = 'CUCA_PRODUCT' THEN balance ELSE 0  END) '产品权证'
+	FROM cuca_user_wallet
+	GROUP BY user_name
+) y
+ON x.user_id = y.user_id
+AND x.user_name IN ('pp12','pp13','pp14','pp15','pp16')
+ORDER BY x.user_name;
+
+
+
+CUCA资产by category OR wallet name
+------------------------------------------------------------------------------------
+SELECT * FROM  cuca_user_wallet;
+
+
+CUCA 套餐介绍
+------------------------------------------------------------------------------------
+SELECT * FROM cuca_package;
+
+
+CUCA 套餐已购买的记录
+------------------------------------------------------------------------------------
+SELECT * FROM cuca_buy_package;

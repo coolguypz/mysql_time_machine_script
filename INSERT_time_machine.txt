@@ -1,0 +1,47 @@
+
+# 增加时光机
+
+SET @user_name = '';
+SET @user_id = ;
+SET @orderNo = CONCAT(776659, round(rand()*10000),DATE_FORMAT(now(), '%d%H%i%s'));
+SET @create_time = '';
+SET @id = CONCAT(159437,round(rand()*10000),DATE_FORMAT(now(), '%d%H%i%s'));
+
+
+# 增加时光机 - 时光机表
+INSERT INTO b_machine_sign 
+(title,	price,	buyNum,	orderNo,pledge_ratio,level_amount,total_amount,limit_amount,mining_rate,pool_times,	status,	get_meony,get_token,member_name,member_id,create_time,remark)
+VALUES 
+ ('TIME入门时光机',100.00,	1,	@orderNo,	50.0000,500.0000,	1000.0000,	500.0000,	0.0004,	30.00,	0,	0.0000,	0.0000,	@user_name,	@user_id, @create_time,'89.8311000000')
+#  ('TIME入门时光机',100.00,	1,	@orderNo,	50.0000,500.0000,	1000.0000,	500.0000,	0.0004,	30.00,	0,	0.0000,	0.0000,	@user_name,	@user_id, @create_time,NULL)
+
+# ,('行星超级时光机',5000.00,	1,	@orderNo,	35.0000,40000.0000,	65000.0000,	40000.0000,	0.0010,	36.00,	0,	0.0000,	0.0000,	@user_name,	@user_id, @create_time,'')
+# ,('卫星超级时光机',1000.00,	1,	@orderNo,	40.0000,7000.0000,	12000.0000,	7000.0000,	0.0010, 34.00,	0,	0.0000,	0.0000,	@user_name,	@user_id, @create_time,'')
+# ,('创世超级时光机',500.00,	1,	@orderNo,	45.0000,3000.0000,	5500.0000,	3000.0000,	0.0010,	32.00,	0,	0.0000,	0.0000,	@user_name,	@user_id, @create_time,'')	
+# ,('银河超级时光机',50000.00,	1,	@orderNo,	20.0000,500000.0000,750000.0000,500000.0000,0.0010,	40.00,	0,	0.0000,	0.0000, @user_name,	@user_id, @create_time,'')
+# ,('恒星超级时光机',10000.00,	1,	@orderNo,	30.0000,90000.0000,	140000.0000,90000.0000,	0.0010,	38.00,	0,	0.0000,	0.0000,	@user_name,	@user_id, @create_time,'')			
+;
+
+#--------------------------------------------------------------------------------------------------------------------------------------
+
+# # 填加时光机 - 日志表 - 月份
+# INSERT INTO b_assets_change_record_2022_
+# (id,tx_no,tx_order,user_id,transfer_user_id,user_name,user_role,
+# user_nickname,user_mobile_phone,transfer_user_name,transfer_user_mobile_phone,transfer_user_nick_name,
+# remark,record_type,record_class,amount,	org_amount,now_amount,create_time,price)
+# VALUES 
+# #  USDT资产购买时光机
+# (@id,'',@orderNo,@user_id,@user_id, @user_name,1,@user_name,@user_name,@user_name,@user_name,@user_name,'购买时光机',8,47,-100.000000000,0.0000000000,0.0000000000, @create_time,1)
+
+# # TIME资产购买时光机
+# (@id,'',@orderNo,@user_id,@user_id, @user_name,1,@user_name,@user_name,@user_name,@user_name,@user_name,'购买时光机',0,47,-89.8311000000,0.0000000000,0.000000000, @create_time,1.1132000000)
+
+# # 时光机钱包购买时光机	
+# (@id,'',@orderNo,@user_id,@user_id, @user_name,1,@user_name,@user_name,@user_name,@user_name,@user_name,'购买时光机',5,47,-89.8311000000,0.0000000000,0.0000000000, @create_time,1.1132000000)
+# ;
+
+# # 更新用户节点token, 如果用户有元始积分 
+# UPDATE b_user_info
+# SET machine_node_token = machine_node_token + 1000, user_ysjf = user_ysjf - 1000
+# WHERE user_name =  @user_name
+# ;

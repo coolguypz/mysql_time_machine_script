@@ -1,0 +1,22 @@
+
+
+# 我的回本倍数 （not include 商家通证记账转换USDT）
+# ------------------------------------------------------------------------------------
+SELECT t1.*, t2.时光机入金, floor(t1.回本_光年值资产转换/t2.时光机入金) 回本倍数 FROM 
+(
+	SELECT 	user_id,y.user_name,
+			user_wallet_total AS '可提TIME资产', 
+			machine_wallet_total AS '购买产品TIME资产5%' ,
+			meta_wallet_total AS '元宇宙钱包',
+			user_wallet_total + machine_wallet_total + meta_wallet_total AS 回本_光年值资产转换 
+	FROM b_obtain_coin_total x
+	JOIN b_user_info y
+	ON x.user_id = y.id
+) t1
+JOIN
+(
+	SELECT member_id,member_name, sum(buyNum * price) 时光机入金 FROM b_machine_sign GROUP BY member_id
+) t2
+ON t1.user_id = t2.member_id
+AND t1.user_id IN (SELECT DISTINCT id FROM b_user_info Group BY id)
+HAVING 回本倍数 > 0;
